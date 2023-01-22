@@ -1,4 +1,4 @@
-import { IPlayer, Player } from './Player/Player';
+import { IPlayer, Player } from './Player';
 import { ILocation, Location } from './GM/Location';
 import { INPC, NPC } from './GM/NPC';
 import { IScene, Scene } from './GM/Scene';
@@ -61,7 +61,7 @@ export class Game {
             players: new Array<IPlayer>,
             locations: new Array<ILocation>,
             npcs: new Array<INPC>,
-            session: new Array<Session>
+            sessions: new Array<ISession>
         };
         for (let play of this.players) {
             result.players.push(play.toStore());
@@ -73,7 +73,7 @@ export class Game {
             result.npcs.push(npc.toStore());
         }
         for (let session of this.sessions) {
-            result.sessions.push(session.ToStore());
+            result.sessions.push(session.toStore());
         }
         return result;
     }

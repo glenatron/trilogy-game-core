@@ -23,7 +23,7 @@ export class Player {
 
     public activeCharacter: string = '';
 
-    public Player(player: IPlayer | null) {
+    constructor(player: IPlayer | null = null) {
         if (player) {
             this.id = player.id;
             this.name = player.name;
