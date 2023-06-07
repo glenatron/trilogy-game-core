@@ -42,6 +42,13 @@ export class Counter {
         this.setValue(this.value - 1);
     }
 
+    public overwrite(newCounter: IStoredCounter) {
+        this.name = newCounter.name;
+        this.size = newCounter.size;
+        this.description = newCounter.description;
+        this.value = newCounter.value;
+    }
+
     public toStore(): IStoredCounter {
         return {
             name: this.name,

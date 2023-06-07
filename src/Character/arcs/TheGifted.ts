@@ -111,8 +111,8 @@ export class TheGifted implements IArcSummary {
             notes: '',
             source: 'arc'
         }, {
-            name: 'When you have answered the four foundational questions about the Other and you choose to open a doorway to where the Other exists.',
-            trigger: '',
+            name: 'Othergate',
+            trigger: 'When you have answered the four foundational questions about the Other and you choose to open a doorway to where the Other exists.',
             stat: '',
             fullSuccess: "Pick three from the following list:<ul><li>You are able to bring someone else with you.</li><li>You will be able to control the place and time of your return.</li><li>The Other will not immediately be aware of your presence.</li><li>You will have control of the doorway.</li></ul>",
             intermediate: "Pick one from the following list:<ul><li>You are able to bring someone else with you.</li><li>You will be able to control the place and time of your return.</li><li>The Other will not immediately be aware of your presence.</li><li>You will have control of the doorway.</li></ul>",

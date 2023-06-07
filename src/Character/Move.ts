@@ -35,24 +35,9 @@ export class Move {
         } else {
             pool.modifier = stat.modifier;
         }
-        if (rollType != RollType.Normal) {
-            pool.addDice();
-        }
+        pool.rollType = rollType;
         pool.roll();
-        switch (rollType) {
-            case RollType.Advantage: this.setResult(pool.best(2));
-                pool.removeDice();
-                break;
-            case RollType.Disadvantage: this.setResult(pool.worst(2));
-                pool.removeDice();
-                break;
-            default: this.setResult(pool.total());
-                break;
-
-        }
-        if (rollType != RollType.Normal) {
-            pool.removeDice();
-        }
+        this.setResult(pool.score());
         return pool;
     }
 

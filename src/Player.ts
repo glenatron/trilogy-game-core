@@ -6,9 +6,11 @@ export interface IPlayer {
 
     name: string;
 
+    isGM: boolean;
+
     characters: Array<ITrilogyCharacterTemplate>;
 
-    activeCharacter: string;
+    activeCharacterId: string;
 }
 
 export class Player {
@@ -17,19 +19,24 @@ export class Player {
 
     public name: string = '';
 
+    public isGM: boolean = false;
+
     public inviteCode: string = '';
 
     public characters: Array<TrilogyCharacter> = [];
 
-    public activeCharacter: string = '';
+    public activeCharacterId: string = '';
 
     constructor(player: IPlayer | null = null) {
         if (player) {
-            this.id = player.id;
+            this.id = player.id == '' ? this.id = crypto.randomUUID() : player.id;
             this.name = player.name;
-            this.activeCharacter = player.activeCharacter;
-            for (let ch of player.characters) {
-                this.characters.push(TrilogyCharacter.fromStore(ch));
+            this.activeCharacterId = player.activeCharacterId;
+            this.isGM = player.isGM;
+            if (!this.isGM) {
+                for (let ch of player.characters) {
+                    this.characters.push(TrilogyCharacter.fromStore(ch));
+                }
             }
         } else {
             this.id = crypto.randomUUID();
@@ -37,12 +44,23 @@ export class Player {
         this.inviteCode = crypto.randomUUID();
     }
 
+    public getActiveCharacter(): TrilogyCharacter | null {
+        if (this.activeCharacterId != null) {
+            let char = this.characters.find(x => x.id == this.activeCharacterId);
+            if (char) {
+                return char;
+            }
+        }
+        return null;
+    }
+
     public toStore() {
         const result = {
             id: this.id,
             name: this.name,
-            activeCharacter: this.activeCharacter,
-            characters: new Array<ITrilogyCharacterTemplate>()
+            activeCharacterId: this.activeCharacterId,
+            characters: new Array<ITrilogyCharacterTemplate>(),
+            isGM: this.isGM
         };
         for (let ch of this.characters) {
             result.characters.push(ch.toStore());

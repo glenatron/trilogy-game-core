@@ -61,9 +61,11 @@ export class CharacterArc {
 
     public lastTurningPoint(): ITurningPoint | null {
         let result: ITurningPoint | null = null;
-        if (0 < this.turningPoints.length) {
-            result = this.summary.turningPoints[this.turningPoints[this.turningPoints.length - 1]];
+        if (this.turningPoints.length == 0) {
+            this.turningPoints.push(0);
         }
+        result = this.summary.turningPoints[this.turningPoints[this.turningPoints.length - 1]];
+
         return result;
     }
 
@@ -78,7 +80,7 @@ export class CharacterArc {
 
     public getCharacterTurningPoints(): Array<ITurningPoint> {
         let result = new Array<ITurningPoint>();
-        for (let i = 0; i < this.turningPoints.length; i++) {
+        for (let i = 0; i < this.summary.turningPoints.length; i++) {
             result.push(this.summary.turningPoints[this.turningPoints[i]]);
         }
         return result;

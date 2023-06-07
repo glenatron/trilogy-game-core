@@ -1,5 +1,5 @@
 import { IGMEntity } from './IGMEntity';
-import { IHarm, HarmTrack } from '../Character/HarmTrack';
+import { Counter, IStoredCounter } from '../Character/Counter';
 
 export interface INPC extends IGMEntity {
     id: string;
@@ -10,15 +10,13 @@ export interface INPC extends IGMEntity {
 
     appearance: string;
 
-    demeanour: string;
-
     description: string;
 
     need: string;
 
     npcRelationships: Array<string>;
 
-    harm: Array<IHarm>;
+    resilience: IStoredCounter;
 
 }
 
@@ -31,8 +29,6 @@ export class NPC {
 
     public appearance: string = '';
 
-    public demeanour: string = '';
-
     public description: string = '';
 
     public need: string = '';
@@ -43,7 +39,8 @@ export class NPC {
 
     public showPlayers: boolean = false;
 
-    public readonly harm: HarmTrack;
+    public readonly resilience: Counter;
+
 
     constructor(detail: INPC) {
         if (!detail.id || detail.id == '') {
@@ -57,15 +54,12 @@ export class NPC {
         this.npcRelationships = detail.npcRelationships || [];
         this.GMNotes = detail.GMNotes;
         this.showPlayers = detail.showPlayers;
-        if (detail.harm && 0 < detail.harm.length) {
-            this.harm = new HarmTrack(detail.harm);
+        this.need = detail.need;
+        this.description = detail.description;
+        if (detail.resilience && 0 < detail.resilience.size) {
+            this.resilience = Counter.fromStore(detail.resilience);
         } else {
-            this.harm = new HarmTrack([
-                { level: 1, value: '' },
-                { level: 1, value: '' },
-                { level: 2, value: '' },
-                { level: 3, value: '' }
-            ]);
+            this.resilience = new Counter('Resilience', 4, 0, 'How much stress/harm this NPC can survive.');
         }
     }
 
@@ -75,14 +69,37 @@ export class NPC {
             name: this.name,
             pronouns: this.pronouns,
             appearance: this.appearance,
-            demeanour: this.demeanour,
             description: this.description,
             need: this.need,
             npcRelationships: this.npcRelationships,
             GMNotes: this.GMNotes,
             showPlayers: this.showPlayers,
-            harm: this.harm.harmLevels
+            resilience: this.resilience.toStore()
 
         };
+    }
+
+    public static fromStore(detail: INPC): NPC {
+        return new NPC(detail);
+    }
+
+    public static create(): NPC {
+        return new NPC({
+            id: '',
+            name: '',
+            pronouns: 'they/them',
+            appearance: '',
+            description: '',
+            need: '',
+            npcRelationships: [],
+            GMNotes: '',
+            showPlayers: false,
+            resilience: {
+                name: 'Resilience',
+                size: 5,
+                value: 0,
+                description: 'How much harm this Opponent can endure.'
+            }
+        })
     }
 }

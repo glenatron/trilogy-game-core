@@ -5,16 +5,23 @@ import { TheVolunteer } from './TheVolunteer';
 
 export class ArcList {
 
+    private static Arcs: Record<string, Function> = {
+        "The Gifted": () => new TheGifted(),
+        "The Chancer": () => new TheChancer(),
+        "The Volunteer": () => new TheVolunteer()
+    };
+
+
     public static getArc(name: string): IArcSummary {
-        switch (name) {
-            case "The Gifted": return new TheGifted();
-                break;
-            case "The Chancer": return new TheChancer();
-                break;
-            case "The Volunteer": return new TheVolunteer();
-                break;
+        if (this.Arcs[name]) {
+            return this.Arcs[name]();
         }
         throw "No arc named " + name + " in the list";
     }
 
+    public static ArcNames(): Array<string> {
+        return Object.keys(this.Arcs);
+    }
+
 }
+

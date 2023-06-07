@@ -6,7 +6,7 @@ import { IStoredCounter } from './Counter';
 import { IHarm } from './HarmTrack';
 import { IMoveSummary } from './IMoveSummary';
 import { IStoredCharacterArc } from './CharacterArc';
-
+/*
 export interface ICharacterArc {
     arcName: string,
 
@@ -20,8 +20,10 @@ export interface ICharacterArc {
 
     notes: string[];
 }
+*/
 
 export interface ITrilogyCharacterTemplate extends ICharacter {
+    id: string;
 
     name: string;
 

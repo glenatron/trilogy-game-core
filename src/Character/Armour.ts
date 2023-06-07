@@ -16,8 +16,8 @@ export class Armour extends Equipment {
         super(name, originalQuality, currentQuality, notes);
         if (useCount < 0) {
             useCount = 0;
-            switch (this.currentQuality) {
 
+            switch (this.currentQuality) {
                 case EquipmentQuality.Masterful: useCount += 9;
                 case EquipmentQuality.Serviceable: useCount += 6;
                 case EquipmentQuality.Serviceable: useCount += 3;
@@ -60,7 +60,7 @@ export class Armour extends Equipment {
         }
     }
 
-    public toStore(): IArmour {
+    public override toStore(): IArmour {
         return {
             name: this.name,
             originalQuality: this.originalQuality,
@@ -70,7 +70,7 @@ export class Armour extends Equipment {
         };
     }
 
-    public static fromStore(arm: IArmour): Armour {
+    public static override fromStore(arm: IArmour): Armour {
         return new Armour(
             arm.name,
             arm.originalQuality,
@@ -79,6 +79,16 @@ export class Armour extends Equipment {
             arm.uses
         );
 
+    }
+
+    public static emptyArmour(): IArmour {
+        return {
+            name: 'No armour',
+            originalQuality: EquipmentQuality.Broken,
+            currentQuality: EquipmentQuality.Broken,
+            notes: '',
+            uses: 0
+        };
     }
 
 

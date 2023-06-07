@@ -1,3 +1,5 @@
+import { RollType } from './DicePool';
+
 export interface IMoveSummary {
 
     name: string;
@@ -16,4 +18,14 @@ export interface IMoveSummary {
     notes: string;
 
     source: string;
+}
+
+export interface IMoveRoll {
+
+    summary: IMoveSummary;
+
+    selectedStat: string;
+
+    rollType: RollType;
+
 }

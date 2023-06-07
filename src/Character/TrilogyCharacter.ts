@@ -1,3 +1,4 @@
+
 import { IStatistic } from './IStatistic';
 import { Character } from './Character';
 import { HarmTrack } from './HarmTrack';
@@ -9,7 +10,7 @@ import { Equipment } from './Equipment';
 import { Armour } from './Armour';
 import { CommonMoves } from './common/CommonMoves';
 import { ArcList } from './arcs/ArcList';
-import { ICharacterArc, ITrilogyCharacterTemplate } from './ITrilogyCharacterTemplate';
+import { ITrilogyCharacterTemplate } from './ITrilogyCharacterTemplate';
 import { CharacterArc, IStoredCharacterArc } from './CharacterArc';
 
 export enum TrilogyStats {
@@ -33,6 +34,7 @@ export class TrilogyCharacter extends Character {
     public arcs = new Array<CharacterArc>();
 
     constructor(
+        id: string,
         name: string,
         stats: Array<IStatistic>,
         public tier: number,
@@ -42,16 +44,17 @@ export class TrilogyCharacter extends Character {
         public wealth: Counter,
         public background: IBackgroundSummary,
         public complication: string,
-        public armour: Armour,
+        public armour: Armour | null,
         public equipment: Array<Equipment>,
         arcNames: Array<string>,
         customMoves: Array<IMoveSummary>
     ) {
-        super(name, stats);
+        super(id, name, stats);
         this.addCommonMoves();
         for (let name of arcNames) {
             this.addArcByName(name);
         }
+        this.harm.character = this;
     }
 
     public addStatModifier(statName: TrilogyStats, value: number) {
@@ -115,8 +118,13 @@ export class TrilogyCharacter extends Character {
         }
     }
 
+    public currentArc(): CharacterArc {
+        return this.arcs[this.arcs.length - 1];
+    }
+
     public toStore(): ITrilogyCharacterTemplate {
         return {
+            id: this.id,
             name: this.name,
             stats: this.stats,
             xp: this.xp.toStore(),
@@ -125,7 +133,7 @@ export class TrilogyCharacter extends Character {
             wealth: this.wealth.toStore(),
             background: this.background,
             complication: this.complication,
-            armour: this.armour.toStore(),
+            armour: (this.armour) ? this.armour.toStore() : Armour.emptyArmour(),
             equipment: this.equipment.map(eq => eq.toStore()),
             arcs: this.arcs.map(ac => ac.toStore()),
             customMoves: this.moves.filter(mv => mv.summary.source != 'common' && mv.summary.source != 'arc').map(filtered => filtered.summary)
@@ -143,6 +151,7 @@ export class TrilogyCharacter extends Character {
 
     public static fromStore(template: ITrilogyCharacterTemplate): TrilogyCharacter {
         const character = new TrilogyCharacter(
+            template.id,
             template.name,
             template.stats,
             template.arcs.length,
@@ -161,6 +170,29 @@ export class TrilogyCharacter extends Character {
             character.addArc(arc);
         }
         return character;
+    }
+
+    public static emptyCharacter(): TrilogyCharacter {
+        let allStats = ["Heart", "Mind", "Strength", "Subtlety", "Charm"];
+        let stats: Array<IStatistic> = allStats.map(m => {
+            return { "name": m, "modifier": 0 };
+        });
+        return new TrilogyCharacter(
+            '',
+            '',
+            stats,
+            0,
+            new Counter('XP', 7, 0, 'Character experience counter, when filled you can hit a Turning Point'),
+            new HarmTrack(),
+            new Counter('Stress', 5, 0, 'Character stress counter, when filled this character is taken out.'),
+            new Counter('Wealth', 7, 1, 'Character wealth counter, each level is a tenfold increase'),
+            { name: 'No Background Selected', description: '', move: null, startingEquipment: '', startingWealthModifier: 0 },
+            'No complication',
+            null,
+            [],
+            [],
+            []
+        );
     }
 
 }
