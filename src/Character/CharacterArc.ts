@@ -46,6 +46,12 @@ export class CharacterArc {
         for (let note of this.summary.arcNoteFields) {
             this.noteValues.push('');
         }
+        for (let bs of this.summary.startingMoves) {
+            bs.source = "arc move";
+        }
+        for (let av of this.summary.advancedMoves) {
+            av.source = "advanced move";
+        }
         if (this.summary.customCounters) {
             for (let counter of this.summary.customCounters) {
                 this.customCounterValues.push(counter.getValue());
@@ -89,7 +95,7 @@ export class CharacterArc {
     public getAvailableTurningPoints(): Array<ITurningPoint> {
         let result = new Array<ITurningPoint>();
         for (let i = 0; i < this.summary.turningPoints.length; i++) {
-            if (0 < this.turningPoints.indexOf(i)) {
+            if (this.turningPoints.indexOf(i) < 0) {
                 result.push(this.summary.turningPoints[i]);
             }
         }
@@ -97,7 +103,7 @@ export class CharacterArc {
     }
 
     public addTurningPoint(index: number): void {
-        if (0 < this.turningPoints.indexOf(index)) {
+        if (this.turningPoints.indexOf(index) < 0) {
             this.turningPoints.push(index);
         } else {
             throw "Turning Point " + this.summary.turningPoints[index].title + " has already been hit!";
@@ -116,7 +122,7 @@ export class CharacterArc {
         let result = new Array<IMoveSummary>();
         if (0 < this.advancedMoves.length) {
             for (let i = 0; i < this.summary.advancedMoves.length; i++) {
-                if (0 < this.advancedMoves.indexOf(i)) {
+                if (this.advancedMoves.indexOf(i) < 0) {
                     result.push(this.summary.advancedMoves[i]);
                 }
             }
@@ -127,7 +133,7 @@ export class CharacterArc {
     }
 
     public addAdvancedMove(name: string): void {
-        let id = this.summary.turningPoints.findIndex(x => x.title == name);
+        let id = this.summary.advancedMoves.findIndex(x => x.name == name);
         if (id < 0) {
             throw "Cannot find a move called " + name;
         }
@@ -162,6 +168,7 @@ export class CharacterArc {
         arc.customStatValues = stored.customStatValues;
         arc.advancedMoves = stored.advancedMoves;
         arc.closed = stored.closed;
+
         return arc;
     }
 

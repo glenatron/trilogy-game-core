@@ -6,8 +6,13 @@ export class Equipment implements IEquipment {
         public name: string,
         public originalQuality: EquipmentQuality,
         public currentQuality: EquipmentQuality,
-        public notes: string
-    ) { }
+        public notes: string,
+        public id: string = ''
+    ) {
+        if (id.trim() == '') {
+            this.id = crypto.randomUUID();
+        }
+    }
 
     public repair() {
         if (this.currentQuality != this.originalQuality) {
@@ -35,6 +40,7 @@ export class Equipment implements IEquipment {
 
     public toStore(): IEquipment {
         return {
+            id: this.id,
             name: this.name,
             originalQuality: this.originalQuality,
             currentQuality: this.currentQuality,
@@ -56,7 +62,7 @@ export class Equipment implements IEquipment {
             case EquipmentQuality.Masterful: result = "Masterful";
                 break;
         }
-        return quality;
+        return result;
     }
 
 }

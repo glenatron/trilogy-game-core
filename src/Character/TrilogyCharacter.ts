@@ -118,6 +118,10 @@ export class TrilogyCharacter extends Character {
         }
     }
 
+    public addMove(mv: IMoveSummary) {
+        this.moves.push(new Move(this, mv));
+    }
+
     public currentArc(): CharacterArc {
         return this.arcs[this.arcs.length - 1];
     }

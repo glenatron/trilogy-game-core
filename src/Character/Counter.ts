@@ -25,7 +25,7 @@ export class Counter {
 
 
     public setValue(newValue: number) {
-        if (0 <= newValue && newValue < this.size) {
+        if (0 <= newValue && newValue <= this.size) {
             this.value = newValue;
         }
     }

@@ -11,9 +11,10 @@ export class Armour extends Equipment {
         originalQuality: EquipmentQuality,
         currentQuality: EquipmentQuality,
         notes: string,
-        useCount: number = -1
+        useCount: number = -1,
+        id: string = ''
     ) {
-        super(name, originalQuality, currentQuality, notes);
+        super(name, originalQuality, currentQuality, notes, id);
         if (useCount < 0) {
             useCount = 0;
 
@@ -62,6 +63,7 @@ export class Armour extends Equipment {
 
     public override toStore(): IArmour {
         return {
+            id: this.id,
             name: this.name,
             originalQuality: this.originalQuality,
             currentQuality: this.currentQuality,
@@ -76,13 +78,15 @@ export class Armour extends Equipment {
             arm.originalQuality,
             arm.currentQuality,
             arm.notes,
-            arm.uses
+            arm.uses,
+            arm.id
         );
 
     }
 
     public static emptyArmour(): IArmour {
         return {
+            id: crypto.randomUUID(),
             name: 'No armour',
             originalQuality: EquipmentQuality.Broken,
             currentQuality: EquipmentQuality.Broken,

@@ -6,6 +6,7 @@ export enum EquipmentQuality {
 }
 
 export interface IEquipment {
+    id: string;
     name: string;
     originalQuality: EquipmentQuality;
     currentQuality: EquipmentQuality;

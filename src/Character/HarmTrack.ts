@@ -34,7 +34,7 @@ export class HarmTrack {
             character = this.character;
         }
         let foundIndex = -1;
-        while (0 < foundIndex && level < 5) {
+        while (foundIndex < 0 && level < 5) {
             foundIndex = this.harmLevels.findIndex(x => x.level == level && x.value == '');
             if (foundIndex < 0) {
                 level++;
@@ -56,10 +56,11 @@ export class HarmTrack {
         this.addHarm(newLevel, newText, character);
     }
 
-    clearHarm(harmIndex: number, character: TrilogyCharacter | null = null): void {
+    clearHarm(harmOrder: number, character: TrilogyCharacter | null = null): void {
         if (!character) {
             character = this.character;
         }
+        const harmIndex = this.harmLevels.findIndex(x => x.order == harmOrder);
         this.harmLevels[harmIndex].value = '';
         if (this.harmLevels[harmIndex].level == 4) {
             character!.movesEnabled = true;
