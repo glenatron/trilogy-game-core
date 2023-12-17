@@ -27,6 +27,31 @@ export class Session {
         }
     }
 
+    public currentScene(): Scene | null {
+        let result = null;
+        if (0 < this.scenes.length) {
+            const scene = this.scenes[this.scenes.length - 1];
+            if (scene.open) {
+                result = scene;
+            }
+        }
+        return result;
+    }
+
+    public closeScene(): void {
+        if (0 < this.scenes.length) {
+            this.scenes[this.scenes.length - 1].close();
+        }
+    }
+
+    public addScene(scene: Scene): void {
+        if (this.currentScene() != null) {
+            throw "Cannot create a scene while a scene is open.";
+        }
+        scene.open = true;
+        this.scenes.push(scene);
+    }
+
     public toStore(): ISession {
         const result = {
             date: this.date,

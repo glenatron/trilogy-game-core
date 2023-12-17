@@ -18,13 +18,19 @@ export interface ITurningPoint {
     triggers: IXPTrigger;
 }
 
+export interface INoteFieldSet {
+    name: string;
+
+    fields: string[];
+}
+
 export interface IArcSummary {
 
     name: string;
 
     summary: string;
 
-    arcNoteFields: string[];
+    arcNoteFields: Array<INoteFieldSet>;
 
     startingEquipment: Array<Equipment>;
 

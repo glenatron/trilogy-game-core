@@ -1,8 +1,9 @@
 
-import { IStatistic } from './IStatistic';
+import { IStatistic, ILockedStatistic } from './IStatistic';
 import { Character } from './Character';
 import { HarmTrack } from './HarmTrack';
-import { Counter } from './Counter';
+import { IStoredCounter, Counter } from './Counter';
+import { IStoredTwoWayCounter, TwoWayCounter } from './TwoWayCounter';
 import { IMoveSummary } from './IMoveSummary';
 import { IBackgroundSummary } from './IBackgroundSummary';
 import { Move } from './Move';
@@ -31,6 +32,10 @@ export class TrilogyCharacter extends Character {
 
     public moves = new Array<Move>();
 
+    public customCounters = new Array<Counter>();
+
+    public twoWayCounters = new Array<TwoWayCounter>();
+
     public arcs = new Array<CharacterArc>();
 
     constructor(
@@ -47,7 +52,15 @@ export class TrilogyCharacter extends Character {
         public armour: Armour | null,
         public equipment: Array<Equipment>,
         arcNames: Array<string>,
-        customMoves: Array<IMoveSummary>
+        customMoves: Array<IMoveSummary>,
+        public pronouns: string,
+        public look: string,
+        public notes: string,
+        public gmNotes: string,
+        public customStats: Array<IStatistic>,
+        storedCounters: Array<IStoredCounter>,
+        storedTwoWayCounters: Array<IStoredTwoWayCounter>
+
     ) {
         super(id, name, stats);
         this.addCommonMoves();
@@ -55,6 +68,8 @@ export class TrilogyCharacter extends Character {
             this.addArcByName(name);
         }
         this.harm.character = this;
+        this.customCounters = storedCounters.map(x => Counter.fromStore(x));
+        this.twoWayCounters = storedTwoWayCounters.map(x => TwoWayCounter.fromStore(x));
     }
 
     public addStatModifier(statName: TrilogyStats, value: number) {
@@ -126,7 +141,68 @@ export class TrilogyCharacter extends Character {
         return this.arcs[this.arcs.length - 1];
     }
 
+    public addTwoWayCounter(counter: IStoredTwoWayCounter): void {
+        var editIdx = this.twoWayCounters.findIndex(x => x.id == counter.id);
+        var idx = this.twoWayCounters.findIndex(x => x.name == counter.name || x.leftPole == counter.leftPole || x.rightPole == counter.rightPole);
+        // Another counter matches one field here, which is against the rules.
+        if (0 <= idx && idx != editIdx) {
+            throw "Cannot add a counter with the same name " + counter.name + " or pole names " + counter.leftPole + " and " + counter.rightPole;
+        }
+        let twoWay = TwoWayCounter.fromStore(counter);
+        if (0 <= editIdx) {
+            this.twoWayCounters[editIdx] = twoWay;
+            this.removeTwoWayCounterStat(twoWay.leftPole);
+            this.removeTwoWayCounterStat(twoWay.rightPole);
+        } else {
+            this.twoWayCounters.push(twoWay);
+        }
+        var left = {
+            "name": twoWay.leftPole,
+            "modifier": twoWay.getLeftPoleRollValue(),
+            "locked": true
+        };
+        this.customStats.push(left);
+        let right: ILockedStatistic = {
+            "name": twoWay.rightPole,
+            "modifier": twoWay.getRightPoleRollValue(),
+            "locked": true
+        }
+        this.customStats.push(right);
+    }
+
+    public removeTwoWayCounter(id: string): void {
+        var idx = this.twoWayCounters.findIndex(x => x.id == id);
+        if (0 <= idx) {
+            const counter = this.twoWayCounters[idx];
+            this.removeTwoWayCounterStat(counter.leftPole);
+            this.removeTwoWayCounterStat(counter.rightPole);
+            this.twoWayCounters = this.twoWayCounters.filter(x => x.id != id);
+        }
+    }
+
+    public removeTwoWayCounterStat(name: string): void {
+        var counter = this.twoWayCounters.find(x => x.name == name) as TwoWayCounter;
+        if (counter != null) {
+            this.customStats = this.customStats.filter(x => x.name != counter.leftPole && x.name != counter.rightPole);
+        }
+    }
+
+    public filterTwoWayCounterStats(): Array<IStatistic> {
+        return this.customStats.filter(x => 0 < this.twoWayCounters.findIndex(y => y.leftPole == x.name || y.rightPole == x.name));
+    }
+
+    public updateTwoWayCounter(counterId: string, value: number) {
+        const idx = this.twoWayCounters.findIndex(x => x.id == counterId);
+        const leftIdx = this.customStats.findIndex(x => x.name == this.twoWayCounters[idx].leftPole);
+        const rightIdx = this.customStats.findIndex(x => x.name == this.twoWayCounters[idx].rightPole);
+
+        this.twoWayCounters[idx].value = value;
+        this.customStats[leftIdx].modifier = this.twoWayCounters[idx].getLeftPoleRollValue();
+        this.customStats[rightIdx].modifier = this.twoWayCounters[idx].getRightPoleRollValue();
+    }
+
     public toStore(): ITrilogyCharacterTemplate {
+        this.twoWayCounters.map(x => this.removeTwoWayCounterStat(x.name));
         return {
             id: this.id,
             name: this.name,
@@ -140,7 +216,14 @@ export class TrilogyCharacter extends Character {
             armour: (this.armour) ? this.armour.toStore() : Armour.emptyArmour(),
             equipment: this.equipment.map(eq => eq.toStore()),
             arcs: this.arcs.map(ac => ac.toStore()),
-            customMoves: this.moves.filter(mv => mv.summary.source != 'common' && mv.summary.source != 'arc').map(filtered => filtered.summary)
+            customMoves: this.moves.filter(mv => mv.summary.source != 'common' && mv.summary.source != 'arc').map(filtered => filtered.summary),
+            pronouns: this.pronouns,
+            look: this.look,
+            notes: this.notes,
+            gmNotes: this.gmNotes,
+            customCounters: this.customCounters.map(x => x.toStore()),
+            customTwoWayCounters: this.twoWayCounters.map(x => x.toStore()),
+            customStats: this.customStats
         }
     }
 
@@ -168,7 +251,15 @@ export class TrilogyCharacter extends Character {
             Armour.fromStore(template.armour),
             template.equipment.map(x => Equipment.fromStore(x)),
             [],
-            template.customMoves
+            template.customMoves,
+            template.pronouns || '',
+            template.look || '',
+            template.notes || '',
+            template.gmNotes || '',
+            template.customStats || [],
+            template.customCounters || [],
+            template.customTwoWayCounters || []
+
         );
         for (let arc of template.arcs) {
             character.addArc(arc);
@@ -193,6 +284,13 @@ export class TrilogyCharacter extends Character {
             { name: 'No Background Selected', description: '', move: null, startingEquipment: '', startingWealthModifier: 0 },
             'No complication',
             null,
+            [],
+            [],
+            [],
+            '',
+            '',
+            '',
+            '',
             [],
             [],
             []

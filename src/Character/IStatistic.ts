@@ -5,3 +5,7 @@ export interface IStatistic {
     modifier: number;
 
 }
+
+export interface ILockedStatistic extends IStatistic {
+    locked: boolean;
+}

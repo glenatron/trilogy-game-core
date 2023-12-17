@@ -1,4 +1,4 @@
-import { IArcSummary, ITurningPoint, IXPTrigger } from './IArcSummary';
+import { IArcSummary, INoteFieldSet, ITurningPoint, IXPTrigger } from './IArcSummary';
 import { IMoveSummary } from './IMoveSummary';
 import { ArcList } from './arcs/ArcList';
 
@@ -138,6 +138,18 @@ export class CharacterArc {
             throw "Cannot find a move called " + name;
         }
         this.advancedMoves.push(id);
+    }
+
+    public getCharacterNoteFields(): Array<INoteFieldSet> {
+        return this.summary.arcNoteFields;
+    }
+
+    public getCharacterNoteValue(fieldName: string): string {
+        const noteIdx = this.summary.arcNoteFields.findIndex(x => x.name == fieldName);
+        if (0 < noteIdx) {
+            return this.noteValues[noteIdx];
+        }
+        return '';
     }
 
     public toStore(): IStoredCharacterArc {

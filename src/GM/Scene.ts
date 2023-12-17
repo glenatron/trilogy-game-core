@@ -1,24 +1,36 @@
 import { IGMEntity } from './IGMEntity';
 import { IGameEvent } from './IGameEvent';
 
+export interface ActionPoint {
+    characterId: string;
+
+    points: number;
+
+    expended: number;
+}
+
+
 export interface IScene extends IGMEntity {
     id: string;
 
-    order: number;
+
 
     locationId: string;
 
+    initiatingPlayerId: string;
+
     npcIds: Array<string>;
 
-    playerIds: Array<string>;
+    characterIds: Array<string>;
 
     name: string;
+
+    actionPoints: Array<ActionPoint>;
 
     events: Array<IGameEvent>;
 }
 
 export class Scene {
-
 
     public locationId = '';
 
@@ -26,17 +38,22 @@ export class Scene {
 
     public npcIds = new Array<string>();
 
-    public playerIds = new Array<string>();
+    public characterIds = new Array<string>();
 
     public events = new Array<IGameEvent>();
 
+    public initiatingPlayerId = '';
+
     public readonly id: string;
 
-    public order = 1;
 
     public GMNotes = '';
 
     public showPlayers = true;
+
+    public actionPoints: Array<ActionPoint>;
+
+    public open = false;
 
     constructor(detail: IScene) {
         if (!detail.id || detail.id == '') {
@@ -47,23 +64,30 @@ export class Scene {
         this.name = detail.name;
         this.locationId = detail.locationId;
         this.npcIds = detail.npcIds;
-        this.playerIds = detail.playerIds;
+        this.characterIds = detail.characterIds;
         this.events = detail.events;
         this.GMNotes = detail.GMNotes;
         this.showPlayers = detail.showPlayers;
+        this.initiatingPlayerId = detail.initiatingPlayerId;
+        this.actionPoints = detail.actionPoints;
+    }
+
+    public close() {
+        this.open = false;
     }
 
     public toStore(): IScene {
         return {
             id: this.id,
+            initiatingPlayerId: this.initiatingPlayerId,
             name: this.name,
-            order: this.order,
             locationId: this.locationId,
             npcIds: this.npcIds,
-            playerIds: this.playerIds,
+            characterIds: this.characterIds,
             events: this.events,
             GMNotes: this.GMNotes,
-            showPlayers: this.showPlayers
+            showPlayers: this.showPlayers,
+            actionPoints: this.actionPoints
         }
     }
 

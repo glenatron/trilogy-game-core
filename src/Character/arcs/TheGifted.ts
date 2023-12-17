@@ -6,7 +6,7 @@ export class TheGifted implements IArcSummary {
 
     public summary = "The Gifted is an arc about a character who has been granted a magical gift or talent - perhaps they were born with it, perhaps they awoke one day with it, perhaps they made a deal with a power to gain it.";
 
-    public arcNoteFields = ["The Other", "What does the Other grant you?", "What does the Other want?", "What kind of entity is the Other?", "What is the Other's name?"];
+    public arcNoteFields = [{ 'name': "The Other", 'fields': ["What does the Other grant you?", "What does the Other want?", "What kind of entity is the Other?", "What is the Other's name?"] }];
 
     public startingEquipment = [];
 

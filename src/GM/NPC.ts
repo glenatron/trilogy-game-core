@@ -1,10 +1,8 @@
 import { IGMEntity } from './IGMEntity';
+import { IIdHaver } from "../Character/IIdHaver";
 import { Counter, IStoredCounter } from '../Character/Counter';
 
 export interface INPC extends IGMEntity {
-    id: string;
-
-    name: string;
 
     pronouns: string;
 
@@ -20,7 +18,7 @@ export interface INPC extends IGMEntity {
 
 }
 
-export class NPC {
+export class NPC implements IIdHaver {
     public readonly id: string;
 
     public name: string = '';

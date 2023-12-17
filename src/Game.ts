@@ -17,13 +17,9 @@ export interface IGame {
 
     locations: Array<ILocation>;
 
-    characters: Array<ITrilogyCharacterTemplate>;
-
     npcs: Array<INPC>;
 
     sessions: Array<ISession>;
-
-    chat: Array<IChat>;
 
 }
 
@@ -36,8 +32,6 @@ export class Game {
     public players: Array<Player> = [];
 
     public locations: Array<Location> = [];
-
-    public characters: Array<TrilogyCharacter> = [];
 
     public npcs: Array<NPC> = [];
 
@@ -66,9 +60,6 @@ export class Game {
             for (let session of game.sessions) {
                 this.sessions.push(new Session(session));
             }
-            for (let character of game.characters) {
-                this.characters.push(TrilogyCharacter.fromStore(character));
-            }
         }
     }
 
@@ -84,6 +75,45 @@ export class Game {
         return null;
     }
 
+    public currentSession(): Session {
+        if (this.sessions.length == 0) {
+            this.sessions.push(new Session(null));
+        }
+        return this.sessions[this.sessions.length - 1];
+    }
+
+    public addCharacter(playerId: string, char: TrilogyCharacter): void {
+        const player = this.players.find(x => x.id == playerId);
+        if (player) {
+            let existingIdx = player.characters.findIndex(x => x.id == char.id);
+            if (0 <= existingIdx) {
+                player.characters[existingIdx] = char;
+            } else {
+                let existingName = player.characters.findIndex(y => y.name == char.name);
+                if (0 <= existingName) {
+                    let count = 1;
+                    while (0 < existingName) {
+                        let longerName = char.name + " " + count;
+                        count++;
+                        existingName = player.characters.findIndex(y => y.name == longerName);
+                        if (existingName < 0) {
+                            char.name = longerName;
+                        }
+                    }
+                    player.characters.push(char);
+                }
+            }
+        }
+    }
+
+    public getCharacters(): Array<TrilogyCharacter> {
+        let characters = new Array<TrilogyCharacter>();
+        for (let play of this.players) {
+            characters = characters.concat(play.characters);
+        }
+        return characters;
+    }
+
     public toStore(): IGame {
         let result = {
             id: this.id,
@@ -92,7 +122,6 @@ export class Game {
             locations: new Array<ILocation>,
             npcs: new Array<INPC>,
             sessions: new Array<ISession>,
-            characters: new Array<ITrilogyCharacterTemplate>,
             chat: this.filterChat()
         };
         for (let play of this.players) {
@@ -106,9 +135,6 @@ export class Game {
         }
         for (let session of this.sessions) {
             result.sessions.push(session.toStore());
-        }
-        for (let char of this.characters) {
-            result.characters.push(char.toStore());
         }
         return result;
     }

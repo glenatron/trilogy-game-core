@@ -3,6 +3,7 @@ import { ICharacter } from "./ICharacter";
 import { EquipmentQuality, IArmour, IEquipment } from './IEquipment';
 import { IBackgroundSummary } from './IBackgroundSummary';
 import { IStoredCounter } from './Counter';
+import { IStoredTwoWayCounter } from './TwoWayCounter';
 import { IHarm } from './HarmTrack';
 import { IMoveSummary } from './IMoveSummary';
 import { IStoredCharacterArc } from './CharacterArc';
@@ -27,6 +28,14 @@ export interface ITrilogyCharacterTemplate extends ICharacter {
 
     name: string;
 
+    pronouns: string;
+
+    look: string;
+
+    notes: string;
+
+    gmNotes: string;
+
     stats: Array<IStatistic>;
 
     xp: IStoredCounter;
@@ -49,4 +58,9 @@ export interface ITrilogyCharacterTemplate extends ICharacter {
 
     customMoves: Array<IMoveSummary>;
 
+    customStats: Array<IStatistic>;
+
+    customCounters: Array<IStoredCounter>;
+
+    customTwoWayCounters: Array<IStoredTwoWayCounter>;
 }

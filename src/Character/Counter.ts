@@ -10,7 +10,7 @@ export interface IStoredCounter {
 
 export class Counter {
 
-    protected value: number = 0;
+    public value: number = 0;
 
 
     constructor(

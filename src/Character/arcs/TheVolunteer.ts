@@ -7,7 +7,7 @@ export class TheVolunteer implements IArcSummary {
 
     public summary = "The Volunteer finds themselves in a new situation and, although they don't know a lot about it, they are very keen to get involved.";
 
-    public arcNoteFields = ['The Organisation'];
+    public arcNoteFields = [{ 'name': 'The Organisation', 'fields': ['About the Organisation'] }];
 
     public startingEquipment = [];
 
